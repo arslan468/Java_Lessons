@@ -1,0 +1,103 @@
+// 4. Soyutlama (Abstraction): Arayüz (Interface) tanımlaması
+interface FinansalIslem {
+    void hesapOzetiGoster();
+}
+
+// 4. Soyutlama (Abstraction): Soyut Sınıf (Abstract Class)
+abstract class BankaHesabi implements FinansalIslem {
+
+    // 1. Kapsülleme (Encapsulation): Veriler dışarıya kapalı (private)
+    private String hesapSahibi;
+    private double bakiye;
+
+    // Yapıcı (Constructor) Metot
+    public BankaHesabi(String hesapSahibi, double bakiye) {
+        // 'this' Komutu: Parametre ile sınıf seviyesindeki değişkeni ayırır.
+        this.hesapSahibi = hesapSahibi;
+        this.bakiye = bakiye;
+    }
+
+    // 1. Kapsülleme: Verilere kontrollü erişim sağlayan metotlar
+    public String getHesapSahibi() {
+        return this.hesapSahibi;
+    }
+
+    public double getBakiye() {
+        return this.bakiye;
+    }
+
+    public void setBakiye(double bakiye) {
+        this.bakiye = bakiye;
+    }
+
+    // Alt sınıfların kendi mantığına göre doldurması zorunlu olan soyut metot
+    public abstract void paraCek(double miktar);
+}
+
+// 2. Kalıtım (Inheritance): BankaHesabi sınıfının özelliklerini miras alır
+class VadesizHesap extends BankaHesabi {
+
+    public VadesizHesap(String hesapSahibi, double bakiye) {
+        super(hesapSahibi, bakiye); // Üst sınıfın yapıcısına (BankaHesabi) parametreleri yollar
+    }
+
+    // 3. Çok Biçimlilik (Polymorphism): Soyut metodu vadesiz hesaba özgü ezer (Override)
+    @Override
+    public void paraCek(double miktar) {
+        if (getBakiye() >= miktar) {
+            setBakiye(getBakiye() - miktar);
+            System.out.println("Çekilen: " + miktar + " TL. Kalan Bakiye: " + getBakiye());
+        } else {
+            System.out.println("Hata: Yetersiz bakiye!");
+        }
+    }
+
+    @Override
+    public void hesapOzetiGoster() {
+        System.out.println("Vadesiz Hesap - Sahibi: " + getHesapSahibi() + ", Bakiye: " + getBakiye());
+    }
+}
+
+// 2. Kalıtım (Inheritance)
+class KrediKarti extends BankaHesabi {
+    private double limit;
+
+    public KrediKarti(String hesapSahibi, double bakiye, double limit) {
+        super(hesapSahibi, bakiye);
+        this.limit = limit; // 'this' kullanımı
+    }
+
+    // 3. Çok Biçimlilik (Polymorphism): Para çekme işlemi kredi kartı mantığına göre değişti
+    @Override
+    public void paraCek(double miktar) {
+        if (getBakiye() + this.limit >= miktar) {
+            setBakiye(getBakiye() - miktar);
+            System.out.println("Kredi kartından " + miktar + " TL çekildi. Güncel Borç: " + getBakiye());
+        } else {
+            System.out.println("Hata: Kredi limiti aşıldı!");
+        }
+    }
+
+    @Override
+    public void hesapOzetiGoster() {
+        System.out.println("Kredi Kartı - Sahibi: " + getHesapSahibi() + ", Borç/Alacak: " + getBakiye() + ", Limit: " + this.limit);
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+
+        // NESNE OLUŞTURMA VE ÇOK BİÇİMLİLİK
+        // Referans tipi 'BankaHesabi' olmasına rağmen hafızada farklı nesneler (VadesizHesap ve KrediKarti) oluşturuldu.
+        BankaHesabi hesap1 = new VadesizHesap("Ali", 1000.0);
+        BankaHesabi hesap2 = new KrediKarti("Ayşe", 0.0, 5000.0);
+
+        hesap1.hesapOzetiGoster();
+        hesap1.paraCek(200); // Vadesiz hesabın paraCek metodu çalışır
+
+        System.out.println("-----------------");
+
+        hesap2.hesapOzetiGoster();
+        hesap2.paraCek(1500); // Kredi kartının paraCek metodu çalışır
+    }
+}
