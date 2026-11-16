@@ -62,8 +62,9 @@ public class Kitap {
         return new Kitap(isbn,1);
     }
 
-
-
+    public int oduncSuresi() {
+        return 7;
+    }
 
 
 
@@ -115,3 +116,63 @@ class OduncRaporu implements AutoCloseable {
         System.out.println("Rapor kapatıldı");
     }
 }
+
+final class KatalogKurallari {
+    public static final int AZAMI_ODUNC = 3;
+
+    private KatalogKurallari() {
+    }
+
+    static {
+        if (AZAMI_ODUNC<=0){
+            throw new IllegalStateException("Azami ödünç pozitif olmalıdır");
+        }
+    }
+}
+
+class Katalog {
+    private static final Katalog INSTANCE = new Katalog();
+
+    private Katalog() {
+    }
+
+    public static Katalog getInstance() {
+        return INSTANCE;
+    }
+}
+
+class Ekitap extends Kitap{
+
+    public Ekitap(String isbn, int toplamAdet){
+        super(isbn,toplamAdet);
+    }
+
+    @Override
+    public int oduncSuresi(){
+        return super.oduncSuresi()+7;
+    }
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
